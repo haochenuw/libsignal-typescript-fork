@@ -271,10 +271,11 @@ export class SessionRecord implements RecordType {
 }
 
 // Serialization helpers
-function toAB(s: string): ArrayBuffer {
+export function toAB(s: string): ArrayBuffer {
     return util.uint8ArrayToArrayBuffer(base64.toByteArray(s))
 }
-function abToS(b: ArrayBuffer): string {
+
+export function abToS(b: ArrayBuffer): string {
     return base64.fromByteArray(new Uint8Array(b))
 }
 
@@ -359,22 +360,36 @@ export function oldRatchetInfoArrayBufferToString(ori: OldRatchetInfo<ArrayBuffe
 }
 
 export function ratchetStringToArrayBuffer(r: Ratchet<string>): Ratchet<ArrayBuffer> {
+    
+    var chainHistory = {}; 
+    for (const [k, v] of Object.entries(r.chainHistory)){
+        chainHistory[k] = chainStringToArrayBuffer(v); 
+    }; 
     return {
         rootKey: toAB(r.rootKey),
         ephemeralKeyPair: r.ephemeralKeyPair && keyPairStirngToArrayBuffer(r.ephemeralKeyPair),
         lastRemoteEphemeralKey: toAB(r.lastRemoteEphemeralKey),
         previousCounter: r.previousCounter,
         added: r.added,
+        rootKeyHistory: r.rootKeyHistory.map(v => toAB(v)), 
+        chainHistory: chainHistory
     }
 }
 
 export function ratchetArrayBufferToString(r: Ratchet<ArrayBuffer>): Ratchet<string> {
+    var chainHistory = {}; 
+    for (const [k, v] of Object.entries(r.chainHistory)){
+        chainHistory[k] = chainArrayBufferToString(v); 
+    }; 
+    
     return {
         rootKey: abToS(r.rootKey),
         ephemeralKeyPair: r.ephemeralKeyPair && keyPairArrayBufferToString(r.ephemeralKeyPair),
         lastRemoteEphemeralKey: abToS(r.lastRemoteEphemeralKey),
         previousCounter: r.previousCounter,
         added: r.added,
+        rootKeyHistory: r.rootKeyHistory.map(v => abToS(v)), 
+        chainHistory: chainHistory
     }
 }
 

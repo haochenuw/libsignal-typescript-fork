@@ -3,7 +3,7 @@ import { DeviceType, SessionType, BaseKeyType, ChainType } from './session-types
 
 import * as Internal from './internal'
 import * as base64 from 'base64-js'
-import { SessionRecord } from './session-record'
+import { abToS, SessionRecord } from './session-record'
 import { PreKeyWhisperMessage } from '@privacyresearch/libsignal-protocol-protobuf-ts'
 import { SessionLock } from './session-lock'
 import { uint8ArrayToArrayBuffer } from './helpers'
@@ -123,12 +123,16 @@ export class SessionBuilder {
 
         const masterKey = await Internal.HKDF(uint8ArrayToArrayBuffer(sharedSecret), new ArrayBuffer(32), 'WhisperText')
 
+        console.log("Hao: session created like this")
+
         const session: SessionType = {
             registrationId: registrationId,
             currentRatchet: {
                 rootKey: masterKey[0],
                 lastRemoteEphemeralKey: SPKb,
                 previousCounter: 0,
+                rootKeyHistory: [], 
+                chainHistory: {}
             },
             indexInfo: {
                 remoteIdentityKey: IKb,
@@ -204,6 +208,8 @@ export class SessionBuilder {
                 rootKey: masterKey[0],
                 lastRemoteEphemeralKey: EKa,
                 previousCounter: 0,
+                rootKeyHistory: [], 
+                chainHistory: {}
             },
             indexInfo: {
                 remoteIdentityKey: IKa,
@@ -238,11 +244,14 @@ export class SessionBuilder {
         const sharedSecret = await Internal.crypto.ECDHE(remoteKey, ephPrivKey)
         const masterKey = await Internal.HKDF(sharedSecret, rootKey, 'WhisperRatchet')
 
+        console.log('Hao: chain created from calculateSendingRatchet')
         session.chains[ephPubKey] = {
             messageKeys: {},
             chainKey: { counter: -1, key: masterKey[1] },
             chainType: ChainType.SENDING,
         }
+        ratchet.rootKeyHistory.push(ratchet.rootKey)
+        ratchet.chainHistory[abToS(ratchet.rootKey)] = session.chains[ephPubKey]; 
         ratchet.rootKey = masterKey[0]
     }
 
