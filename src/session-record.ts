@@ -325,6 +325,7 @@ export function chainStringToArrayBuffer(c: Chain<string>): Chain<ArrayBuffer> {
             counter,
         },
         messageKeys: newMessageKeys,
+        chainKeyHistory: c.chainKeyHistory.map(item => toAB(item))
     }
 }
 
@@ -342,6 +343,7 @@ export function chainArrayBufferToString(c: Chain<ArrayBuffer>): Chain<string> {
             counter,
         },
         messageKeys: newMessageKeys,
+        chainKeyHistory: c.chainKeyHistory.map(item => abToS(item))
     }
 }
 

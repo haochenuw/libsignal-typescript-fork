@@ -46,6 +46,7 @@ export interface Chain<T> {
     chainType: ChainType
     chainKey: { key: T; counter: number }
     messageKeys: { [key: number]: T }
+    chainKeyHistory: Array<T>
 }
 
 export interface PendingPreKey<T> {

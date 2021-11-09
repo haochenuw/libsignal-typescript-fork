@@ -190,8 +190,9 @@ export class SessionCipher {
 
         chain.messageKeys[chain.chainKey.counter + 1] = mac
         chain.chainKey.key = key
+        chain.chainKeyHistory.push(key)
         chain.chainKey.counter += 1
-        await this.fillMessageKeys(chain, counter)
+        await this.fillMessageKeys(chain, counter) // Hao: recursive. 
     }
 
     private async calculateRatchet(session: SessionType, remoteKey: ArrayBuffer, sending: boolean) {
@@ -213,13 +214,14 @@ export class SessionCipher {
             messageKeys: {},
             chainKey: { counter: -1, key: masterKey[1] },
             chainType: sending ? ChainType.SENDING : ChainType.RECEIVING,
+            chainKeyHistory: [masterKey[1]]
         }
         const chain = session.chains[base64.fromByteArray(new Uint8Array(ephemeralPublicKey))]; 
         console.log(`Chain creation with chainType ${chain.chainType}`); 
         console.log(`Chain creation with chainKey ${tob64Str(chain.chainKey.key)}`); 
-        ratchet.rootKeyHistory.push(ratchet.rootKey)
         ratchet.chainHistory[abToS(ratchet.rootKey)] = chain; 
         ratchet.rootKey = masterKey[0]
+        ratchet.rootKeyHistory.push(ratchet.rootKey)
     }
 
     async decryptPreKeyWhisperMessage(buff: string | ArrayBuffer, encoding?: string): Promise<ArrayBuffer> {

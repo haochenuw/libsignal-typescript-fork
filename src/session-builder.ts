@@ -131,7 +131,7 @@ export class SessionBuilder {
                 rootKey: masterKey[0],
                 lastRemoteEphemeralKey: SPKb,
                 previousCounter: 0,
-                rootKeyHistory: [], 
+                rootKeyHistory: [masterKey[0]], 
                 chainHistory: {}
             },
             indexInfo: {
@@ -208,7 +208,7 @@ export class SessionBuilder {
                 rootKey: masterKey[0],
                 lastRemoteEphemeralKey: EKa,
                 previousCounter: 0,
-                rootKeyHistory: [], 
+                rootKeyHistory: [masterKey[0]], 
                 chainHistory: {}
             },
             indexInfo: {
@@ -249,10 +249,11 @@ export class SessionBuilder {
             messageKeys: {},
             chainKey: { counter: -1, key: masterKey[1] },
             chainType: ChainType.SENDING,
+            chainKeyHistory: [masterKey[1]]
         }
-        ratchet.rootKeyHistory.push(ratchet.rootKey)
         ratchet.chainHistory[abToS(ratchet.rootKey)] = session.chains[ephPubKey]; 
         ratchet.rootKey = masterKey[0]
+        ratchet.rootKeyHistory.push(ratchet.rootKey)
     }
 
     async processPreKey(device: DeviceType): Promise<SessionType> {
