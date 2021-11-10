@@ -374,7 +374,8 @@ export function ratchetStringToArrayBuffer(r: Ratchet<string>): Ratchet<ArrayBuf
         previousCounter: r.previousCounter,
         added: r.added,
         rootKeyHistory: r.rootKeyHistory.map(v => toAB(v)), 
-        chainHistory: chainHistory
+        chainHistory: chainHistory, 
+        rootKeyToEphemeralKeyMapping: r.rootKeyToEphemeralKeyMapping
     }
 }
 
@@ -391,7 +392,8 @@ export function ratchetArrayBufferToString(r: Ratchet<ArrayBuffer>): Ratchet<str
         previousCounter: r.previousCounter,
         added: r.added,
         rootKeyHistory: r.rootKeyHistory.map(v => abToS(v)), 
-        chainHistory: chainHistory
+        chainHistory: chainHistory, 
+        rootKeyToEphemeralKeyMapping: r.rootKeyToEphemeralKeyMapping
     }
 }
 

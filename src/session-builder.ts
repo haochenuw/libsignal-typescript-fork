@@ -132,7 +132,8 @@ export class SessionBuilder {
                 lastRemoteEphemeralKey: SPKb,
                 previousCounter: 0,
                 rootKeyHistory: [masterKey[0]], 
-                chainHistory: {}
+                chainHistory: {}, 
+                rootKeyToEphemeralKeyMapping: {}
             },
             indexInfo: {
                 remoteIdentityKey: IKb,
@@ -201,6 +202,8 @@ export class SessionBuilder {
         }
 
         const masterKey = await Internal.HKDF(uint8ArrayToArrayBuffer(sharedSecret), new ArrayBuffer(32), 'WhisperText')
+        const rootKeyStr: string = abToS(masterKey[0]); 
+        const ekStr: string = abToS(masterKey[0]); 
 
         const session: SessionType = {
             registrationId: message.registrationId,
@@ -209,7 +212,8 @@ export class SessionBuilder {
                 lastRemoteEphemeralKey: EKa,
                 previousCounter: 0,
                 rootKeyHistory: [masterKey[0]], 
-                chainHistory: {}
+                chainHistory: {}, 
+                rootKeyToEphemeralKeyMapping: {rootKeyStr: ekStr}
             },
             indexInfo: {
                 remoteIdentityKey: IKa,
@@ -251,6 +255,7 @@ export class SessionBuilder {
             chainType: ChainType.SENDING,
             chainKeyHistory: [masterKey[1]]
         }
+        ratchet.rootKeyToEphemeralKeyMapping[abToS(rootKey)] = ephPubKey; // add the mapping in other places too. 
         ratchet.chainHistory[abToS(ratchet.rootKey)] = session.chains[ephPubKey]; 
         ratchet.rootKey = masterKey[0]
         ratchet.rootKeyHistory.push(ratchet.rootKey)

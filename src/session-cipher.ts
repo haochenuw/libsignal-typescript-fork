@@ -210,16 +210,18 @@ export class SessionCipher {
             ephemeralPublicKey = remoteKey
         }
         console.log("Hao: chain created in calculateRatchet")
-        session.chains[base64.fromByteArray(new Uint8Array(ephemeralPublicKey))] = {
+        const ephPub = base64.fromByteArray(new Uint8Array(ephemeralPublicKey)); 
+        session.chains[ephPub] = {
             messageKeys: {},
             chainKey: { counter: -1, key: masterKey[1] },
             chainType: sending ? ChainType.SENDING : ChainType.RECEIVING,
             chainKeyHistory: [masterKey[1]]
         }
-        const chain = session.chains[base64.fromByteArray(new Uint8Array(ephemeralPublicKey))]; 
+        const chain = session.chains[ephPub]; 
         console.log(`Chain creation with chainType ${chain.chainType}`); 
         console.log(`Chain creation with chainKey ${tob64Str(chain.chainKey.key)}`); 
         ratchet.chainHistory[abToS(ratchet.rootKey)] = chain; 
+        ratchet.rootKeyToEphemeralKeyMapping[abToS(ratchet.rootKey)] = ephPub; // add the mapping in other places too. 
         ratchet.rootKey = masterKey[0]
         ratchet.rootKeyHistory.push(ratchet.rootKey)
     }

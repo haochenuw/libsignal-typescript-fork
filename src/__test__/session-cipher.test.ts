@@ -35,7 +35,8 @@ const session = {
         lastRemoteEphemeralKey: new ArrayBuffer(32),
         previousCounter: 0,
         rootKeyHistory: [], 
-        chainHistory: {}
+        chainHistory: {}, 
+        rootKeyToEphemeralKeyMapping: {}
     },
     indexInfo: {
         baseKey: new ArrayBuffer(32),

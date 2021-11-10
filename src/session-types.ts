@@ -36,6 +36,7 @@ export interface Ratchet<T> {
     added?: number //timestamp
     rootKeyHistory: Array<T>
     chainHistory: {[rootKeyString: string]: Chain<T>}
+    rootKeyToEphemeralKeyMapping: {[rootKeyString: string]: string}
 }
 export interface OldRatchetInfo<T> {
     ephemeralKey: T
