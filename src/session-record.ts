@@ -367,6 +367,15 @@ export function ratchetStringToArrayBuffer(r: Ratchet<string>): Ratchet<ArrayBuf
     for (const [k, v] of Object.entries(r.chainHistory)){
         chainHistory[k] = chainStringToArrayBuffer(v); 
     }; 
+
+    var rootKeyToEphemeralKeyMapping = {}; 
+    for (const [key, value] of Object.entries(r.rootKeyToEphemeralKeyMapping)) {
+        rootKeyToEphemeralKeyMapping[key] = {
+           "local": keyPairStirngToArrayBuffer(value["local"]), 
+          "remote": toAB(value["remote"]),
+          "sending": value["sending"]
+        }
+    }    
     return {
         rootKey: toAB(r.rootKey),
         ephemeralKeyPair: r.ephemeralKeyPair && keyPairStirngToArrayBuffer(r.ephemeralKeyPair),
@@ -375,7 +384,7 @@ export function ratchetStringToArrayBuffer(r: Ratchet<string>): Ratchet<ArrayBuf
         added: r.added,
         rootKeyHistory: r.rootKeyHistory.map(v => toAB(v)), 
         chainHistory: chainHistory, 
-        rootKeyToEphemeralKeyMapping: r.rootKeyToEphemeralKeyMapping
+        rootKeyToEphemeralKeyMapping: rootKeyToEphemeralKeyMapping
     }
 }
 
@@ -384,7 +393,14 @@ export function ratchetArrayBufferToString(r: Ratchet<ArrayBuffer>): Ratchet<str
     for (const [k, v] of Object.entries(r.chainHistory)){
         chainHistory[k] = chainArrayBufferToString(v); 
     }; 
-    
+    var rootKeyToEphemeralKeyMapping = {}; 
+    for (const [key, value] of Object.entries(r.rootKeyToEphemeralKeyMapping)) {
+        rootKeyToEphemeralKeyMapping[key] = {
+           "local": keyPairArrayBufferToString(value["local"]), 
+          "remote": abToS(value["remote"]),
+          "sending": value["sending"]
+        }
+    }   
     return {
         rootKey: abToS(r.rootKey),
         ephemeralKeyPair: r.ephemeralKeyPair && keyPairArrayBufferToString(r.ephemeralKeyPair),
@@ -393,7 +409,7 @@ export function ratchetArrayBufferToString(r: Ratchet<ArrayBuffer>): Ratchet<str
         added: r.added,
         rootKeyHistory: r.rootKeyHistory.map(v => abToS(v)), 
         chainHistory: chainHistory, 
-        rootKeyToEphemeralKeyMapping: r.rootKeyToEphemeralKeyMapping
+        rootKeyToEphemeralKeyMapping: rootKeyToEphemeralKeyMapping
     }
 }
 

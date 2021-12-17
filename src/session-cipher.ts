@@ -221,7 +221,12 @@ export class SessionCipher {
         console.log(`Chain creation with chainType ${chain.chainType}`); 
         console.log(`Chain creation with chainKey ${tob64Str(chain.chainKey.key)}`); 
         ratchet.chainHistory[abToS(ratchet.rootKey)] = chain; 
-        ratchet.rootKeyToEphemeralKeyMapping[abToS(ratchet.rootKey)] = ephPub; // add the mapping in other places too. 
+        ratchet.rootKeyToEphemeralKeyMapping[abToS(ratchet.rootKey)] = 
+        {
+            "remote": remoteKey, 
+            "local": ratchet.ephemeralKeyPair, 
+            "sending": sending, 
+        }; // add the mapping in other places too. 
         ratchet.rootKey = masterKey[0]
         ratchet.rootKeyHistory.push(ratchet.rootKey)
     }
@@ -309,6 +314,7 @@ export class SessionCipher {
     }
 
     decryptWhisperMessage(buff: string | ArrayBuffer, encoding?: string): Promise<ArrayBuffer> {
+        console.log("Decrypting normal message from " + this.remoteAddress.getName())
         encoding = encoding || 'binary'
         if (encoding !== 'binary') {
             throw new Error(`unsupported encoding: ${encoding}`)
@@ -422,12 +428,12 @@ export class SessionCipher {
             console.log("Hao: Skipped stepping ratchet in maybeStepRatchet function")
             return Promise.resolve()
         }
-        console.log("Hao: step ratchet")
+        console.log("Hao: stepping ratchet by calling calculateRatchet twice...")
 
 
         const ratchet = session.currentRatchet
         if (!ratchet.ephemeralKeyPair) {
-            throw new Error("attempting to step reatchet without ephemeral key"); 
+            throw new Error("attempting to step ratchet without ephemeral key"); 
         }
         const previousRatchet = session.chains[base64.fromByteArray(new Uint8Array(ratchet.lastRemoteEphemeralKey))]
         if (previousRatchet !== undefined) {
@@ -445,7 +451,7 @@ export class SessionCipher {
         const previousRatchetKey = base64.fromByteArray(new Uint8Array(ratchet.ephemeralKeyPair.pubKey))
         if (session.chains[previousRatchetKey] !== undefined) {
             ratchet.previousCounter = session.chains[previousRatchetKey].chainKey.counter
-            delete session.chains[previousRatchetKey]
+            // delete session.chains[previousRatchetKey]
         }
         const keyPair = await Internal.crypto.createKeyPair()
         ratchet.ephemeralKeyPair = keyPair

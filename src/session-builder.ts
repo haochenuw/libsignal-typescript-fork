@@ -34,6 +34,7 @@ export class SessionBuilder {
             device.signedPreKey.signature
         )
 
+        // the base key 
         const ephemeralKey = await Internal.crypto.createKeyPair()
 
         const deviceOneTimePreKey = device.preKey?.publicKey
@@ -123,8 +124,6 @@ export class SessionBuilder {
 
         const masterKey = await Internal.HKDF(uint8ArrayToArrayBuffer(sharedSecret), new ArrayBuffer(32), 'WhisperText')
 
-        console.log("Hao: session created like this")
-
         const session: SessionType = {
             registrationId: registrationId,
             currentRatchet: {
@@ -147,7 +146,9 @@ export class SessionBuilder {
         // otherwise we figure it out when we first maybeStepRatchet with the remote's ephemeral key
 
         session.indexInfo.baseKey = EKa.pubKey
+        session.indexInfo.privateBaseKey = EKa.privKey
         session.indexInfo.baseKeyType = BaseKeyType.OURS
+        // the first local ephemeral key 
         const ourSendingEphemeralKey = await Internal.crypto.createKeyPair()
         session.currentRatchet.ephemeralKeyPair = ourSendingEphemeralKey
 
@@ -203,7 +204,6 @@ export class SessionBuilder {
 
         const masterKey = await Internal.HKDF(uint8ArrayToArrayBuffer(sharedSecret), new ArrayBuffer(32), 'WhisperText')
         const rootKeyStr: string = abToS(masterKey[0]); 
-        const ekStr: string = abToS(masterKey[0]); 
 
         const session: SessionType = {
             registrationId: message.registrationId,
@@ -213,7 +213,7 @@ export class SessionBuilder {
                 previousCounter: 0,
                 rootKeyHistory: [masterKey[0]], 
                 chainHistory: {}, 
-                rootKeyToEphemeralKeyMapping: {rootKeyStr: ekStr}
+                rootKeyToEphemeralKeyMapping: {}
             },
             indexInfo: {
                 remoteIdentityKey: IKa,
@@ -255,7 +255,12 @@ export class SessionBuilder {
             chainType: ChainType.SENDING,
             chainKeyHistory: [masterKey[1]]
         }
-        ratchet.rootKeyToEphemeralKeyMapping[abToS(rootKey)] = ephPubKey; // add the mapping in other places too. 
+        ratchet.rootKeyToEphemeralKeyMapping[abToS(rootKey)] = 
+            {
+              "local": ratchet.ephemeralKeyPair,
+              "remote": remoteKey, 
+              "sending": true
+            }; 
         ratchet.chainHistory[abToS(ratchet.rootKey)] = session.chains[ephPubKey]; 
         ratchet.rootKey = masterKey[0]
         ratchet.rootKeyHistory.push(ratchet.rootKey)

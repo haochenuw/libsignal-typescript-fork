@@ -26,6 +26,7 @@ export interface IndexInfo<T> {
     remoteIdentityKey: T
     baseKey?: T
     baseKeyType?: BaseKeyType
+    privateBaseKey?: T
 }
 
 export interface Ratchet<T> {
@@ -36,7 +37,7 @@ export interface Ratchet<T> {
     added?: number //timestamp
     rootKeyHistory: Array<T>
     chainHistory: {[rootKeyString: string]: Chain<T>}
-    rootKeyToEphemeralKeyMapping: {[rootKeyString: string]: string}
+    rootKeyToEphemeralKeyMapping: {[rootKeyString: string]: {"local": KeyPairType<T>, "remote": T, "sending": boolean}}
 }
 export interface OldRatchetInfo<T> {
     ephemeralKey: T
