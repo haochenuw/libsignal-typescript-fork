@@ -10,11 +10,11 @@
     "test": "jest --config jestconfig.json",
     "lint": "eslint -c .eslintrc.js  '**/*.ts'",
     "format": "prettier '**/{*.{js?(on),ts?(x),md},.*.js?(on)}' --write --list-different --config prettier.config.js",
-    "prepare": "yarn run build",
+    "prepare": "npm run build",
     "build": "tsc -d",
-    "prepublishOnly": "yarn run lint",
-    "preversion": "yarn run lint && yarn test",
-    "version": "yarn run format && git add -A src",
+    "prepublishOnly": "npm run lint",
+    "preversion": "npm run lint && npm test",
+    "version": "npm run format && git add -A src",
     "postversion": "git push && git push --tags"
   },
   "devDependencies": {
@@ -39,5 +39,8 @@
     "lib/*.js",
     "lib/*.d.ts",
     "lib/internal/**/*"
-  ]
+  ],
+  "engines": {
+    "npm": ">=6.0.0"
+  }
 }
