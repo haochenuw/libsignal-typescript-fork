@@ -44,9 +44,14 @@ export interface OldRatchetInfo<T> {
     added: number //timestamp
 }
 
+export interface ChainKey<T> {
+    key: T
+    counter: number
+}
+
 export interface Chain<T> {
     chainType: ChainType
-    chainKey: { key: T; counter: number }
+    chainKey: ChainKey<T>
     messageKeys: { [key: number]: T }
     chainKeyHistory: Array<T>
 }

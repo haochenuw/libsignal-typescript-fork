@@ -20,7 +20,7 @@ export class SessionCipher {
     storage: StorageType
     remoteAddress: SignalProtocolAddress
     constructor(storage: StorageType, remoteAddress: SignalProtocolAddress | string) {
-        
+
         this.storage = storage
         this.remoteAddress =
             typeof remoteAddress === 'string' ? SignalProtocolAddress.fromString(remoteAddress) : remoteAddress
@@ -192,7 +192,7 @@ export class SessionCipher {
         chain.chainKey.key = key
         chain.chainKeyHistory.push(key)
         chain.chainKey.counter += 1
-        await this.fillMessageKeys(chain, counter) // Hao: recursive. 
+        await this.fillMessageKeys(chain, counter) // Hao: recursive.
     }
 
     private async calculateRatchet(session: SessionType, remoteKey: ArrayBuffer, sending: boolean) {
@@ -210,23 +210,23 @@ export class SessionCipher {
             ephemeralPublicKey = remoteKey
         }
         console.log("Hao: chain created in calculateRatchet")
-        const ephPub = base64.fromByteArray(new Uint8Array(ephemeralPublicKey)); 
+        const ephPub = base64.fromByteArray(new Uint8Array(ephemeralPublicKey));
         session.chains[ephPub] = {
             messageKeys: {},
             chainKey: { counter: -1, key: masterKey[1] },
             chainType: sending ? ChainType.SENDING : ChainType.RECEIVING,
             chainKeyHistory: [masterKey[1]]
         }
-        const chain = session.chains[ephPub]; 
-        console.log(`Chain creation with chainType ${chain.chainType}`); 
-        console.log(`Chain creation with chainKey ${tob64Str(chain.chainKey.key)}`); 
-        ratchet.chainHistory[abToS(ratchet.rootKey)] = chain; 
-        ratchet.rootKeyToEphemeralKeyMapping[abToS(ratchet.rootKey)] = 
+        const chain = session.chains[ephPub];
+        console.log(`Chain creation with chainType ${chain.chainType}`);
+        console.log(`Chain creation with chainKey ${tob64Str(chain.chainKey.key)}`);
+        ratchet.chainHistory[abToS(ratchet.rootKey)] = chain;
+        ratchet.rootKeyToEphemeralKeyMapping[abToS(ratchet.rootKey)] =
         {
-            "remote": remoteKey, 
-            "local": ratchet.ephemeralKeyPair, 
-            "sending": sending, 
-        }; // add the mapping in other places too. 
+            "remote": remoteKey,
+            "local": ratchet.ephemeralKeyPair,
+            "sending": sending,
+        }; // add the mapping in other places too.
         ratchet.rootKey = masterKey[0]
         ratchet.rootKeyHistory.push(ratchet.rootKey)
     }
@@ -433,13 +433,14 @@ export class SessionCipher {
 
         const ratchet = session.currentRatchet
         if (!ratchet.ephemeralKeyPair) {
-            throw new Error("attempting to step ratchet without ephemeral key"); 
+            throw new Error("attempting to step ratchet without ephemeral key");
         }
         const previousRatchet = session.chains[base64.fromByteArray(new Uint8Array(ratchet.lastRemoteEphemeralKey))]
         if (previousRatchet !== undefined) {
             console.log("Hao: deleting previous ratchet (or rather, a chain)")
             await this.fillMessageKeys(previousRatchet, previousCounter).then(function () {
-                delete previousRatchet.chainKey.key
+                // delete previousRatchet.chainKey.key
+                previousRatchet.chainKey.key = new ArrayBuffer(0)
                 session.oldRatchetList[session.oldRatchetList.length] = {
                     added: Date.now(),
                     ephemeralKey: ratchet.lastRemoteEphemeralKey,
