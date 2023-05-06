@@ -303,7 +303,7 @@ export class SessionCipher {
             const plaintext = await this.doDecryptWhisperMessage(buffer, session)
 
             return { plaintext: plaintext, session: session }
-        } catch (e) {
+        } catch (e: Error) {
             if (e.name === 'MessageCounterError') {
                 return Promise.reject(e)
             }
