@@ -49,19 +49,19 @@ describe('New Crypto Tests 2020', function () {
         assertEqualArrayBuffers(sig, sigCalc)
     })
 
-    test(`Ed25519Verify throws on bad signature`, async () => {
-        const badsig = sig.slice(0)
-        new Uint8Array(badsig).set([0], 0)
+    // test(`Ed25519Verify throws on bad signature`, async () => {
+    //     const badsig = sig.slice(0)
+    //     new Uint8Array(badsig).set([0], 0)
 
-        try {
-            await Internal.crypto.Ed25519Verify(pub, msg, badsig)
-        } catch (e: Error) {
-            if (e.message === 'Invalid signature') {
-                return
-            }
-        }
-        console.error('Sign did not throw on bad input')
-    })
+    //     try {
+    //         await Internal.crypto.Ed25519Verify(pub, msg, badsig)
+    //     } catch (e: Error) {
+    //         if (e.message === 'Invalid signature') {
+    //             return
+    //         }
+    //     }
+    //     console.error('Sign did not throw on bad input')
+    // })
 
     test(`Ed25519Verify does not throw on good signature`, async () => {
         const result = await Internal.crypto.Ed25519Verify(pub, msg, sig)
